@@ -11,23 +11,40 @@ class AppImage extends StatelessWidget {
   const AppImage(this.path,
       {super.key, this.width, this.height, this.fit = BoxFit.cover, this.radius = 0});
 
+  Widget _placeholder() => Container(
+        width: width,
+        height: height,
+        color: AppColors.tan,
+        child: const Icon(Icons.coffee, color: AppColors.brown),
+      );
+
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: Image.asset(
+    final Widget child;
+    if (path.isEmpty) {
+      // New product without an image yet
+      child = _placeholder();
+    } else if (path.startsWith('http')) {
+      // Image uploaded to Supabase Storage (or any URL)
+      child = Image.network(
         path,
         width: width,
         height: height,
         fit: fit,
-        errorBuilder: (_, __, ___) => Container(
-          width: width,
-          height: height,
-          color: AppColors.tan,
-          child: const Icon(Icons.coffee, color: AppColors.brown),
-        ),
-      ),
-    );
+        errorBuilder: (_, __, ___) => _placeholder(),
+        loadingBuilder: (_, w, progress) => progress == null ? w : _placeholder(),
+      );
+    } else {
+      // Bundled asset
+      child = Image.asset(
+        path,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (_, __, ___) => _placeholder(),
+      );
+    }
+    return ClipRRect(borderRadius: BorderRadius.circular(radius), child: child);
   }
 }
 

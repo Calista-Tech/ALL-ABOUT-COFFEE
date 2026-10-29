@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/app_config.dart';
 import 'core/app_colors.dart';
 import 'screens/splash_screen.dart';
+import 'services/product_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,6 +11,10 @@ Future<void> main() async {
     url: AppConfig.supabaseUrl,
     anonKey: AppConfig.supabaseAnonKey,
   );
+
+  // Start listening to the Supabase `products` table (realtime).
+  ProductService.start();
+
   runApp(const MyApp());
 }
 
